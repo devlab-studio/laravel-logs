@@ -23,7 +23,6 @@ return new class extends Migration
             }
             $table->timestamps();
             $table->foreignId('created_user')->index();
-            $table->foreignId('updated_user')->nullable()->index();
         });
     }
 

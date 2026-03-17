@@ -40,6 +40,7 @@ class Model extends LaravelModel
                 'original' => $this->getOriginal(),
                 'changes' => $this->getDirty(),
             ];
+            $log->created_user = $user_id;
             $log->save();
         }
         parent::save($options); // Calls Default Save
@@ -49,29 +50,21 @@ class Model extends LaravelModel
 	 */
     public function delete ($do_log = true)
     {
-        $result = static::checkDelete($this->getTable(), [$this->id]);
+        $user_id = Auth::user()->id ?? config('constants.users.system');
 
-        if ($result) {
-            return $result;
-        } else {
-            if ($do_log) {
-                $procedure_id = $this->checkProcedure(get_class($this).'::delete');
-                $log = new ModelsLog();
-                $log->procedure_id = $procedure_id;
-                $log->procedure = get_class($this).'::delete';
-                $log->data = [
-                    'id' => $this->id
-                ];
-                $log->save();
-            }
-
-            if (array_key_exists('updated_user', $this->attributes) && empty($this->updated_user)) {
-                $this->updated_user = Auth::user()->id ?? $this->updated_user;
-            }
-
-            parent::delete(); // Calls Default Save
-            return false;
+        if ($do_log) {
+            $procedure_id = $this->checkProcedure(get_class($this).'::delete');
+            $log = new ModelsLog();
+            $log->procedure_id = $procedure_id;
+            $log->procedure = get_class($this).'::delete';
+            $log->data = [
+                'id' => $this->id
+            ];
+            $log->created_user = $user_id;
+            $log->save();
         }
+
+        parent::delete(); // Calls Default Save
     }
 
     private function checkProcedure($procedure)

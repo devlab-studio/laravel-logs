@@ -2,9 +2,9 @@
 
 namespace Devlab\LaravelLogs;
 
+use Devlab\LaravelLogs\Commands\ClearLogs;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
-use Devlab\LaravelLogs\Commands\LaravelLogsCommand;
 
 class LaravelLogsServiceProvider extends PackageServiceProvider
 {
@@ -19,11 +19,9 @@ class LaravelLogsServiceProvider extends PackageServiceProvider
             ->name('laravel-logs')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_laravel_logs_table')
-            ->hasMigration('create_laravel_logs_audits_table')
-            ->hasMigration('create_models_procedures_otable')
+            ->hasMigration('create_models_procedures_table')
             ->hasMigration('create_models_logs_table')
-            ->hasCommand(LaravelLogsCommand::class);
+            ->hasCommand(ClearLogs::class);
     }
 
     public function boot()
