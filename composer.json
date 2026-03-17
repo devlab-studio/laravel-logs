@@ -1,6 +1,6 @@
 {
     "name": "devlab-studio/laravel-logs",
-    "description": "This is my package laravel-logs",
+    "description": "Package to manage logs in Laravel applications.",
     "keywords": [
         "Devlab",
         "laravel",
