@@ -1,8 +1,8 @@
 <?php
 
 namespace Devlab\LaravelLogs\Commands;
-
-use Devlab\LaravelLogs\Models\LocalLog;
+;
+use Devlab\LaravelLogs\Models\ModelsLog;
 use Illuminate\Console\Command;
 
 class ClearLogs extends Command
@@ -38,7 +38,7 @@ class ClearLogs extends Command
      */
     public function handle()
     {
-        LocalLog::where('created_at', '<=', now()->subMonths(12))->delete();
+        ModelsLog::where('created_at', '<=', now()->subMonths(12))->delete();
 
         return 0;
     }
