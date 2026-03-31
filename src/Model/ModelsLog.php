@@ -5,12 +5,13 @@ namespace Devlab\LaravelLogs\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\WithExtensions;
+use Devlab\LaravelMailer\Traits\WithExtensions;
 use Carbon\Carbon;
 
 class ModelsLog extends Model
 {
     use HasFactory;
+    use WithExtensions;
 
     protected $casts = [
         'created_at' => 'datetime',
