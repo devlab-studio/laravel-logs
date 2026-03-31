@@ -28,11 +28,5 @@ class LaravelLogsServiceProvider extends PackageServiceProvider
     {
         // Charge migrations
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
-
-        // Editable files to be published
-        $this->publishes([
-            __DIR__ . '/../database/migrations' => database_path('migrations'),
-        ], 'devlab-core-files');
-
     }
 }
