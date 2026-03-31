@@ -5,7 +5,7 @@ namespace Devlab\LaravelLogs\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Devlab\LaravelMailer\Traits\WithExtensions;
+use Devlab\LaravelLogs\Traits\WithExtensions;
 use Carbon\Carbon;
 
 class ModelsLog extends Model

@@ -1,6 +1,6 @@
 <?php
 
-namespace Devlab\LaravelMailer\Traits;
+namespace Devlab\LaravelLogs\Traits;
 
 use Devlab\LaravelMailer\Classes\dlSign;
 use Illuminate\Database\Eloquent\Builder;
