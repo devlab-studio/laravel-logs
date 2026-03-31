@@ -26,6 +26,7 @@ class LaravelLogsServiceProvider extends PackageServiceProvider
 
     public function boot()
     {
+        parent::boot();
         // Charge migrations
         $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
     }
