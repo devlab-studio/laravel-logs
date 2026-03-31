@@ -27,7 +27,7 @@ class ModelsLog extends Model
      * @return mixed Collection
      *
      */
-    public static function emtGet(
+    public static function dlGet(
         int $model_id = 0,
         int $records_in_page = 0,
         array $sort = [],
