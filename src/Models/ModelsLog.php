@@ -5,12 +5,14 @@ namespace Devlab\LaravelLogs\Models;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\WithExtensions;
+use Devlab\LaravelLogs\Traits\WithExtensions;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class ModelsLog extends Model
 {
     use HasFactory;
+    use WithExtensions;
 
     protected $casts = [
         'created_at' => 'datetime',
@@ -72,6 +74,29 @@ class ModelsLog extends Model
         return $oQuery;
     }
 
+    public static function doLog($procedure, $data)
+    {
+        $user_id = Auth::user()->id ?? config('constants.users.system');
+        $procedure_id = self::checkProcedure($procedure);
+        $log = new self();
+        $log->procedure_id = $procedure_id;
+        $log->procedure = $procedure;
+        $log->data = $data;
+        $log->created_user = $user_id;
+        $log->save();
+    }
+
+    private static function checkProcedure($procedure)
+    {
+        $bd_procedure = ModelsProcedure::where('procedure', $procedure)->get()->first();
+        if (empty($bd_procedure)) {
+            $bd_procedure = new ModelsProcedure();
+            $bd_procedure->procedure = $procedure;
+            $bd_procedure->save();
+        }
+        return $bd_procedure->id;
+    }
+
     public function models_procedure()
     {
         return $this->hasOne(ModelsProcedure::class, 'id', 'procedure_id');
@@ -80,10 +105,5 @@ class ModelsLog extends Model
     public function createduser()
     {
         return $this->hasOne(User::class, 'id', 'created_user');
-    }
-
-    public function updateduser()
-    {
-        return $this->hasOne(User::class, 'id', 'updated_user');
     }
 }
