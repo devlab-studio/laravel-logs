@@ -6,62 +6,139 @@
 </p>
 <br></br>
 
+<p align="right"> <a href="README.es.md"><img src="https://img.shields.io/badge/Espa%C3%B1ol-Ver%20en%20ES-blue.svg?style=flat-square" alt="Español"/></a> </p>
 
-**Laravel Logs** es un paquete Laravel para la gestión avanzada de logs y auditorías, permitiendo registrar, consultar y limpiar logs de manera eficiente en tus proyectos Laravel.
+**Laravel Logs** is a Laravel package for advanced logs and audits management, allowing you to register, query, and clean logs efficiently in your Laravel projects.
 
-- Registro y consulta de logs personalizados
-- Auditoría de modelos y procedimientos
-- Comandos para limpiar y gestionar logs
-- Configuración flexible y extensible
+- Register and query custom logs
+- Audit models and procedures
+- Commands to clean and manage logs
+- Flexible and extensible configuration
 
-## Instalación
+## What It Does
 
+This package adds a lightweight audit layer for Eloquent models by logging save and delete operations.
 
-Instala el paquete vía composer:
+- Tracks procedure names such as `App\\Models\\Order::save` and `App\\Models\\Order::delete`
+- Stores change payloads in JSON format
+- Records the user responsible for the action
+- Keeps a normalized table of procedures for easier filtering/reporting
+
+## Installation
+
+Install the package via Composer:
 
 ```bash
 composer require devlab-studio/laravel-logs
 ```
 
-
-Publica y ejecuta las migraciones:
+Publish and run the migrations:
 
 ```bash
 php artisan vendor:publish --tag=laravel-logs-migrations
 php artisan migrate
 ```
 
-
-Publica el archivo de configuración:
+Publish the configuration file:
 
 ```bash
 php artisan vendor:publish --tag=laravel-logs-config
 ```
 
+## Useful Commands
 
-## Comandos útiles
-
-Limpia los logs antiguos:
+Clean old logs:
 
 ```bash
 php artisan logs:clear
 ```
 
-Consulta logs desde consola:
+`logs:clear` removes records older than 12 months.
 
-```bash
-php artisan logs:list
+## How It Works
+
+1. Your model extends the package base model (`Devlab\\LaravelLogs\\Models\\Model`).
+2. On `save()`, the package detects dirty attributes and logs original vs changed data.
+3. On `delete()`, the package logs the deleted model ID.
+4. The procedure name is registered in `models_procedures` if it does not exist yet.
+5. The action is stored in `models_logs` with timestamps and `created_user`.
+
+## Database Structure
+
+### `models_procedures`
+
+- `id`
+- `procedure` (example: `App\\Models\\Invoice::save`)
+- `created_at`, `updated_at`
+
+### `models_logs`
+
+- `id`
+- `procedure`
+- `procedure_id` (FK to `models_procedures.id`)
+- `data` (JSON / text)
+- `created_user`
+- `created_at`, `updated_at`
+
+## Usage Example
+
+Extend your models from the package base model:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Devlab\LaravelLogs\Models\Model;
+
+class Customer extends Model
+{
+  protected $fillable = ['name', 'email'];
+}
 ```
 
+Create and update records as usual:
+
+```php
+$customer = Customer::create([
+  'name' => 'Jane Doe',
+  'email' => 'jane@example.com',
+]);
+
+$customer->email = 'jane.doe@example.com';
+$customer->save();
+```
+
+Each operation writes an audit entry in `models_logs`.
+
+## Querying Logs
+
+You can query logs directly with Eloquent:
+
+```php
+use Devlab\LaravelLogs\Models\ModelsLog;
+
+$latestLogs = ModelsLog::query()
+  ->latest('id')
+  ->limit(20)
+  ->get();
+```
+
+The package also includes helper methods in `ModelsLog` (like `dlGet`) for filtered retrieval.
 
 ## Seeders
 
-Si necesitas datos de ejemplo para pruebas, puedes crear tus propios seeders para poblar la tabla de logs.
+If you need sample data for testing, you can create your own seeders to populate the logs table.
 
+## Notes
 
-## Recursos
+- The package expects an authenticated user for `created_user` when available.
+- If no authenticated user exists, it falls back to `config('constants.users.system')`.
+- Ensure your application defines that fallback config value for CLI/background contexts.
 
-- [Soporte y contacto](https://dev-lab.es/contact)
+## Resources
+
+- [Support and contact](https://dev-lab.es/contact)
 
 ---
 
