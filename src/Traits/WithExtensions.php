@@ -2,10 +2,7 @@
 
 namespace Devlab\LaravelLogs\Traits;
 
-use Devlab\LaravelMailer\Classes\dlSign;
 use Illuminate\Database\Eloquent\Builder;
-use Devlab\LaravelCore\Classes\dlURL;
-use Illuminate\Support\Pluralizer;
 
 trait WithExtensions
 {
@@ -18,21 +15,52 @@ trait WithExtensions
             return $query->whereIn($field, $value);
         }
     }
-    public static function getModelData($oQuery, $iModel_id, $iRecordsInPage = 0, $aWithDerived = [], $keyBy = 'id') {
-        if (!empty($aWithDerived)) {
-            $oQuery->with($aWithDerived);
+    public function scopeOrWhereInto(Builder $query, $field, $value)
+    {
+        if (is_array($value)) {
+            return $query->orWhereIn($field, $value);
+        } else {
+            $value = explode(",", $value);
+            return $query->orWhereIn($field, $value);
         }
-        if ($iModel_id == 0) {
-            $iRecordsInPage = ($iRecordsInPage == 0 ) ? config('constants.pagination.DEFAULT_PAGE_RECORDS') : $iRecordsInPage;
-            if ($iRecordsInPage>0) {
-                $oRecords = $oQuery->paginate($iRecordsInPage);
-                $oRecordsC = $oRecords->getCollection()->keyBy($keyBy);
-                $oRecords->setCollection($oRecordsC);
+    }
+    public function scopeWhereNotInto(Builder $query, $field, $value)
+    {
+        if (is_array($value)) {
+            return $query->whereNotIn($field, $value);
+        } else {
+            $value = explode(",", $value);
+            return $query->whereNotIn($field, $value);
+        }
+    }
+    public function scopeOrWhereNotInto(Builder $query, $field, $value)
+    {
+        if (is_array($value)) {
+            return $query->orWhereNotIn($field, $value);
+        } else {
+            $value = explode(",", $value);
+            return $query->orWhereNotIn($field, $value);
+        }
+    }
+    public static function getModelData($query, $model_id, $records_in_page = 0, $with = [], $key_by = 'id') {
+        if (!empty($with)) {
+            $query->with($with);
+        }
+        if ($model_id == 0) {
+            $records_in_page = ($records_in_page == 0 ) ? config('constants.pagination.DEFAULT_PAGE_RECORDS', 150) : $records_in_page;
+            if ($records_in_page > 0) {
+                $oRecords = $query->paginate($records_in_page);
+                if (!empty($key_by)) {
+                    $oRecordsC = $oRecords->getCollection()->keyBy($key_by);
+                    $oRecords->setCollection($oRecordsC);
+                }
             } else {
-                $oRecords = $oQuery->get()->keyBy($keyBy);
+                if (!empty($key_by)) {
+                    $oRecords = $query->get()->keyBy($key_by);
+                }
             }
         } else {
-            $oRecords = $oQuery->get()->first();
+            $oRecords = $query->get()->first();
         }
         return $oRecords;
     }
